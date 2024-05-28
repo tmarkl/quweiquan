@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PAGE_SIZE } from "../constants";
 import { getIsMobile, getNameOptions, getNames } from "../utils";
 import { Button, Card, Col, Form, Input, Radio, Row } from "antd";
@@ -20,8 +20,11 @@ export default function Name() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [buttonText, setButtonText] = useState("取名");
+  const [isMobile, setIsMobile] = useState<boolean>(false);
 
-  const isMobile = getIsMobile();
+  useEffect(() => {
+    setIsMobile(!!getIsMobile());
+  }, []);
 
   const [data, setData] = useState<DataType[]>([]);
   const [currentName, setCurrentName] = useState("");
@@ -46,11 +49,11 @@ export default function Name() {
         }
         setData(names);
         setLoading(false);
+        setButtonText("换一批");
       });
   };
 
   const submit = async () => {
-    setButtonText("换一批");
     const { type } = await form.validateFields();
     loadBook(type);
   };
@@ -74,8 +77,7 @@ export default function Name() {
           >
             <Form.Item name="type" className="w-[300px] sm:w-[512px]">
               <Radio.Group
-                size="large"
-                optionType={isMobile ? "default" : "button"}
+                optionType={!isMobile ? "button" : "default"}
                 buttonStyle="solid"
                 options={getNameOptions}
               />

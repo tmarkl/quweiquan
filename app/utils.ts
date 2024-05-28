@@ -117,6 +117,7 @@ export const getNames = (data: any) => {
 };
 
 export const getIsMobile = () => {
+  if (typeof window === "undefined") return false;
   var ua = window.navigator.userAgent;
   var ipad = ua.match(/(iPad).*OS\s([\d_]+)/);
   var isIphone = !ipad && ua.match(/(iPhone\sOS)\s([\d_]+)/);
