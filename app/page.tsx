@@ -27,10 +27,10 @@ export default function Home() {
           ))}
         </div>
       </main>
-      <div className="flex absolute bottom-0 left-0 right-0 justify-center mb-2 text-xs">
+      <div className="flex flex-col absolute bottom-0 left-0 right-0 items-center mb-2 text-xs">
         <span className="pr-2">© 2024 TOOLDAILY.COM All Rights Reserved</span>
         <a href="https://beian.miit.gov.cn/" target="_blank">
-          湘ICP备2024067814号
+          湘ICP备2024067814号-1
         </a>
       </div>
     </div>
