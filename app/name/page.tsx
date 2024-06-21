@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { PAGE_SIZE } from "../constants";
-import { getIsMobile, getNameOptions, getNames } from "../utils";
+import { getIsMobile, nameSourceOptions } from "../utils";
 import { Button, Card, Col, Form, Input, Radio, Row } from "antd";
+import { useSwrGetData } from "../swr";
 
 export type DataType = {
   title: string;
@@ -15,47 +16,28 @@ export type DataType = {
   sentence: string;
   sentenceHtml: string;
 };
+const key = "/api/v1/names";
 
 export default function Name() {
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
   const [buttonText, setButtonText] = useState("取名");
   const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [swrKey, setSwrKey] = useState<null | any[]>(null);
+
+  const { data, isLoading } = useSwrGetData(swrKey, {
+    onSuccess: () => {
+      setButtonText("换一批");
+    },
+  });
 
   useEffect(() => {
     setIsMobile(!!getIsMobile());
   }, []);
 
-  const [data, setData] = useState<DataType[]>([]);
-  const [currentName, setCurrentName] = useState("");
-
-  const loadBook = (type: string) => {
-    setLoading(true);
-    const url = `/json/${type}.json`;
-    fetch(url)
-      .then((res) => res.json())
-      .then((r) => {
-        const names = [];
-        for (let i = 0; i < PAGE_SIZE; i++) {
-          const name = getNames(r);
-
-          if (name) {
-            const sentenceHtml = name.sentence.replace(
-              new RegExp(`[${name}]`, "ig"),
-              (char: string) => `<i>${char}</i>`
-            );
-            names.push({ ...name, sentenceHtml });
-          }
-        }
-        setData(names);
-        setLoading(false);
-        setButtonText("换一批");
-      });
-  };
-
   const submit = async () => {
-    const { type } = await form.validateFields();
-    loadBook(type);
+    const { type, lastName } = await form.validateFields();
+    const timestamp = Date.now();
+    setSwrKey([key, { source: type, xing: lastName, timestamp }]);
   };
 
   return (
@@ -70,7 +52,7 @@ export default function Name() {
         <div className="flex flex-col justify-center items-center w-full sm:w-[600px]">
           <Form
             form={form}
-            initialValues={{ type: "shijing" }}
+            initialValues={{ type: 5 }}
             onValuesChange={() => {
               setButtonText("取名");
             }}
@@ -79,28 +61,22 @@ export default function Name() {
               <Radio.Group
                 optionType={!isMobile ? "button" : "default"}
                 buttonStyle="solid"
-                options={getNameOptions}
+                options={nameSourceOptions}
               />
             </Form.Item>
             <Form.Item
-              name="firstName"
+              name="lastName"
               className="w-[300px] sm:w-[512px]"
               rules={[{ message: "请先输入您的姓氏", required: true }]}
             >
-              <Input
-                size="large"
-                placeholder="请输入您的姓氏,如：张"
-                onBlur={(e) => {
-                  setCurrentName(e.target.value);
-                }}
-              />
+              <Input size="large" placeholder="请输入您的姓氏,如：张" />
             </Form.Item>
             <Button
               size="large"
               type="primary"
               className="w-[300px] sm:w-[512px]"
               onClick={submit}
-              loading={loading}
+              loading={isLoading}
             >
               {buttonText}
             </Button>
@@ -108,7 +84,7 @@ export default function Name() {
         </div>
 
         <Row gutter={[16, 16]} className="w-full mt-[80px]">
-          {data.map((item) => (
+          {data?.data?.map((item: any) => (
             <Col span={isMobile ? 24 : 8} key={item.name}>
               <Card
                 hoverable
@@ -118,20 +94,15 @@ export default function Name() {
                 }}
               >
                 <div className="flex text-[30px] font-bold justify-center text-white">
-                  {currentName}
                   {item.name}
                 </div>
                 <div className="m mt-[20px] text-[16px]  text-white">
-                  <span>「</span>
-                  {item.sentenceHtml}
-                  <span>」</span>
+                  {item.source}
                 </div>
                 <div className="flex justify-between mt-4  text-white">
-                  <div>
-                    {item.book}&nbsp;•&nbsp;{item.title}
-                  </div>
-                  <div>
-                    [{item.dynasty}]&nbsp;{item.author || "佚名"}
+                  <div>{item.title}</div>
+                  <div className="whitespace-nowrap pl-2">
+                    {item.author || "佚名"}
                   </div>
                 </div>
               </Card>

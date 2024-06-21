@@ -7,14 +7,17 @@ export const homTabs = [
   },
 ];
 
-export const getNameOptions = [
-  { value: "shijing", label: "诗经" },
-  { value: "chuci", label: "楚辞" },
-  { value: "tangshi", label: "唐诗" },
-  { value: "songci", label: "宋词" },
-  { value: "yuefu", label: "乐府诗集" },
-  { value: "gushi", label: "古诗三百首" },
-  { value: "cifu", label: "著名辞赋" },
+//  0: "默认", 1: "诗经", 2: "楚辞", 3: "论语",
+//  4: "周易", 5: "唐诗", 6: "宋诗", 7: "宋词"
+
+export const nameSourceOptions = [
+  { value: 5, label: "唐诗" },
+  { value: 6, label: "宋诗" },
+  { value: 7, label: "宋词" },
+  { value: 1, label: "诗经" },
+  { value: 2, label: "楚辞" },
+  { value: 3, label: "论语" },
+  { value: 4, label: "周易" },
 ];
 
 export const choose = (arr: any) => {
