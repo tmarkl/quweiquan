@@ -43,16 +43,3 @@ export const swrMutRequest = async (
   }
   return request(url, c).then((res) => res.data);
 };
-
-// https://swr.vercel.app/docs/mutation
-type Args = AxiosRequestConfig | string | null | undefined;
-export type SwrMutKey = Args | (() => Args);
-export const useSwrMutRequest = <Data = any, ExtraArg = any>(
-  key: SwrMutKey,
-  config?: SWRMutationConfiguration<Data, any, ExtraArg, SwrMutKey>
-) =>
-  useSWRMutation<Data, any, SwrMutKey, ExtraArg>(
-    key,
-    config?.fetcher || swrMutRequest,
-    config
-  );
